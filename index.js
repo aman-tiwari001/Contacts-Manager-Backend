@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const contactRouter = require('./routes/contactRoutes');
 const userRouter = require('./routes/userRoutes');
 const errorHandler = require('./middleware/errorHandler');
@@ -10,6 +11,10 @@ const PORT = process.env.PORT || 5001;
 connectDB(); // connect to mongodb
 
 //Middlewares
+app.use(cors({
+    origin: "http://localhost:3000",
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
 app.use(express.json());
 app.use('/api/contacts', contactRouter);
 app.use('/api/users', userRouter);
