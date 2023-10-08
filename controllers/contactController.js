@@ -92,10 +92,15 @@ const getContactsByQuery = asyncHandler(async (req, res) => {
     const queryString = req.params.query;
 
     const searchResults = await Contact.find({
-        $or: [
-            { name: { $regex: queryString} },  // Case-insensitive partial match for name
-            { email: { $regex: queryString} }, // Case-insensitive partial match for email
-            { phone: { $regex: queryString} }, // Case-insensitive partial match for phone
+        $and: [
+            {
+                $or: [
+                    { name: { $regex: queryString, $options: 'i' } },
+                    { email: { $regex: queryString, $options: 'i' } },
+                    { phone: { $regex: queryString, $options: 'i' } },
+                ],
+            },
+            { user_id: req.user.id },
         ],
     });
 
@@ -106,6 +111,7 @@ const getContactsByQuery = asyncHandler(async (req, res) => {
         res.status(200).json(searchResults);
     }
 });
+
 
 
 module.exports = {getAllContacts, getContact, createContact, updateContact, deleteContact, deleteAllContacts, getContactsByQuery};
