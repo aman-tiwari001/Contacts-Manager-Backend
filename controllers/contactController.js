@@ -85,4 +85,27 @@ const deleteAllContacts = asyncHandler(async (req, res) => {
     res.status(204).send();
 });
 
-module.exports = {getAllContacts, getContact, createContact, updateContact, deleteContact, deleteAllContacts};
+// @desc Seacrch contacts by query
+// @route GET /api/contacts/:q
+// @access private
+const getContactsByQuery = asyncHandler(async (req, res) => {
+    const queryString = req.params.query;
+
+    const searchResults = await Contact.find({
+        $or: [
+            { name: { $regex: queryString} },  // Case-insensitive partial match for name
+            { email: { $regex: queryString} }, // Case-insensitive partial match for email
+            { phone: { $regex: queryString} }, // Case-insensitive partial match for phone
+        ],
+    });
+
+    if (searchResults.length === 0) {
+        res.status(404);
+        throw new Error(`No results for "${queryString}"`);
+    } else {
+        res.status(200).json(searchResults);
+    }
+});
+
+
+module.exports = {getAllContacts, getContact, createContact, updateContact, deleteContact, deleteAllContacts, getContactsByQuery};
